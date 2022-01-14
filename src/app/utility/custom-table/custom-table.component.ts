@@ -2,7 +2,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ComponentType } from '@angular/cdk/portal';
 import { Component, ContentChild, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatDrawer } from '@angular/material/sidenav';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { RowActionDirective } from './row-action.directive';
 import { SelectedActionDirective } from './selected-action.directive';
@@ -22,18 +24,12 @@ export interface MatTableColumns<T> {
 })
 export class CustomTableComponent<T> implements OnInit {
 
-  private _data: T[] = [];
-  @Input() set data(d: T[]) {
-    this._data = d;
-    if (this._data) {
-      this.dataSource = new MatTableDataSource<T>(this._data);
-      this.selectionMode.reset();
-    }
-  }
-
-  @Input() tableHeaderText: string = '';
+  @Input() tableHeader: string = '';
   @Input() columns: MatTableColumns<T>[] = [];
   @Input() selectable: boolean = false;
+  @Input() paginate: boolean = true;
+  @Input() recordsPerPage: number = 10;
+  @Input() sortable: boolean = true;
   @Input() customSearchComponent!: ComponentType<unknown>;
 
   @ViewChild('drawer') public drawer!: MatDrawer;
@@ -44,6 +40,18 @@ export class CustomTableComponent<T> implements OnInit {
 
   @ViewChild('customSearchPlaceholder', { read: ViewContainerRef, static: true }) customSearchPlaceholderRef!: ViewContainerRef;
 
+  @ViewChild(MatPaginator, { static: false }) set paginator(matpaginator: MatPaginator) {
+    if (this.dataSource) {
+      this.dataSource.paginator = matpaginator;
+    }
+  }
+
+  @ViewChild(MatSort, { static: false }) set sort(matsort: MatSort) {
+    if (this.dataSource) {
+      this.dataSource.sort = matsort;
+    }
+  }
+
   selectColumnName: string = '__select';
   rowActionColumn: string = '__actions';
 
@@ -51,6 +59,8 @@ export class CustomTableComponent<T> implements OnInit {
   labelMap: Map<string, string> = new Map();
   selection = new SelectionModel<T>(true, []);
   selectionMode: FormControl = new FormControl(false);
+
+  private _data: T[] = [];
 
   constructor() { }
 
@@ -80,8 +90,21 @@ export class CustomTableComponent<T> implements OnInit {
     this.customSearchPlaceholderRef.createComponent(this.customSearchComponent);
   }
 
+  @Input() set data(d: T[]) {
+    this._data = d;
+    if (this._data) {
+      this.dataSource = new MatTableDataSource<T>(this._data);
+      this.selectionMode.reset();
+    }
+  }
+
   get displayedColumns(): string[] {
     return [...this.selectable ? [this.selectColumnName] : [], ...this.iterateColumns, ...this.rowAction ? [this.rowActionColumn] : []];
+  }
+
+  get pageSizeOptions(): number[] {
+    const lastOptionRequired: number = this._data.length + (this.recordsPerPage-1);
+    return [1, 2, 3, 4, 5].map(num => num * this.recordsPerPage).filter(num => num <= lastOptionRequired);
   }
 
   private get iterateColumns(): string[] {

@@ -1,4 +1,5 @@
-<app-custom-table [data]="data" [columns]="columns" [selectable]=true [customSearchComponent]="searchComponent">
+<app-custom-table tableHeader="Periodic Table" [data]="data" [columns]="columns" [selectable]=true [paginate]=true [recordsPerPage]="5"
+    [sortable]=true [customSearchComponent]="searchComponent">
     <ng-container *bnTableFilter>
         <button mat-menu-item (click)="showAll()">
             <mat-icon>filter_list_off</mat-icon>
