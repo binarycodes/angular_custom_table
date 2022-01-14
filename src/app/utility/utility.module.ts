@@ -1,17 +1,18 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CustomTableComponent } from './custom-table/custom-table.component';
+import { NgModule } from '@angular/core';
 import { SharedModule } from '../shared/shared.module';
+import { CustomTableComponent } from './custom-table/custom-table.component';
+import { RowActionDirective } from './custom-table/row-action.directive';
+import { SelectedActionDirective } from './custom-table/selected-action.directive';
+import { TableFilterDirective } from './custom-table/table-filter.directive';
 
-
+const COMPONENTS = [CustomTableComponent, SelectedActionDirective, TableFilterDirective, RowActionDirective];
 
 @NgModule({
-  declarations: [
-    CustomTableComponent
-  ],
+  declarations: [...COMPONENTS],
   imports: [
     CommonModule, SharedModule
   ],
-  exports: [CustomTableComponent]
+  exports: [...COMPONENTS]
 })
 export class UtilityModule { }

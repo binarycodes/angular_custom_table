@@ -1,8 +1,5 @@
-<app-custom-table [data]="data" [columns]="columns" [selectable]=true>
-    <ng-template #searchComponentTemplate>
-        <app-search-component></app-search-component>
-    </ng-template>
-    <ng-template #filterActionTemplate>
+<app-custom-table [data]="data" [columns]="columns" [selectable]=true [customSearchComponent]="searchComponent">
+    <ng-container *bnTableFilter>
         <button mat-menu-item (click)="showAll()">
             <mat-icon>filter_list_off</mat-icon>
             <span>All</span>
@@ -15,8 +12,8 @@
             <mat-icon>event</mat-icon>
             <span>Expiring Soon</span>
         </button>
-    </ng-template>
-    <ng-template #selectedActionTemplate let-selection>
+    </ng-container>
+    <ng-container *bnSelectedAction="let selection">
         <div class="flex">
             <button class="mr-2" mat-raised-button color="primary" (click)="edit(selection)">
                 <mat-icon>edit</mat-icon> Edit
@@ -25,13 +22,13 @@
                 <mat-icon>delete</mat-icon> Delete
             </button>
         </div>
-    </ng-template>
-    <ng-template #rowActionTemplate let-item>
+    </ng-container>
+    <ng-container *bnRowAction="let item">
         <button mat-icon-button color="primary" (click)="edit(item)">
             <mat-icon>edit</mat-icon>
         </button>
         <button mat-icon-button color="warn" (click)="delete(item)">
             <mat-icon>delete</mat-icon>
         </button>
-    </ng-template>
+    </ng-container>
 </app-custom-table>

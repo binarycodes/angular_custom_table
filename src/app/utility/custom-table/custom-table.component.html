@@ -1,7 +1,6 @@
 <mat-drawer-container class="example-container" autosize>
     <mat-drawer #drawer mode="over" position="end" class="p-10 flex items-center min-w-1/3">
-        <ng-container [ngTemplateOutlet]="searchComponentTemplate">
-        </ng-container>
+        <ng-template #customSearchPlaceholder></ng-template>
     </mat-drawer>
     <mat-card>
         <mat-card-content>
@@ -15,8 +14,7 @@
                 *ngIf="selection.hasValue()">
                 <div class="flex pl-4 pr-10">{{selection.selected.length}} record(s) selected</div>
                 <mat-slide-toggle class="mx-6" [formControl]="selectionMode">Selected Records</mat-slide-toggle>
-                <ng-template #defaultSelectedActionTemplate let-items></ng-template>
-                <ng-container [ngTemplateOutlet]="selectedActionTemplate || defaultSelectedActionTemplate"
+                <ng-container [ngTemplateOutlet]="selectedAction.templateRef"
                     [ngTemplateOutletContext]="{ $implicit: selectedItems}">
                 </ng-container>
             </mat-card>
@@ -36,9 +34,11 @@
                     </td>
                 </ng-container>
 
-                <ng-container *ngFor="let column of iterateColumns" [matColumnDef]="column">
-                    <th mat-header-cell *matHeaderCellDef> {{labelMap.get(column)}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element[column]}} </td>
+                <ng-container *ngFor="let column of columns" [matColumnDef]="column.name">
+                    <th mat-header-cell *matHeaderCellDef> {{column.label}} </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span [innerHTML]="column.display(element)"></span>
+                    </td>
                 </ng-container>
 
 
@@ -47,8 +47,7 @@
                         Actions
                     </th>
                     <td mat-cell *matCellDef="let element">
-                        <ng-template #defaultRowActionTemplate let-items></ng-template>
-                        <ng-container [ngTemplateOutlet]="rowActionTemplate || defaultRowActionTemplate"
+                        <ng-container [ngTemplateOutlet]="rowAction.templateRef"
                             [ngTemplateOutletContext]="{ $implicit: element}">
                         </ng-container>
                     </td>
@@ -62,9 +61,7 @@
 </mat-drawer-container>
 
 <mat-menu #menu="matMenu">
-    <ng-template #defaultFilterActionTemplate></ng-template>
-    <ng-container [ngTemplateOutlet]="filterActionTemplate || defaultFilterActionTemplate">
-    </ng-container>
+    <ng-container [ngTemplateOutlet]="tableFilter.templateRef"></ng-container>
     <hr />
     <button mat-menu-item (click)="openSearch()">
         <mat-icon>filter_alt</mat-icon>

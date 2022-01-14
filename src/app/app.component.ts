@@ -1,6 +1,6 @@
 import { ComponentType } from '@angular/cdk/portal';
-import { Component, TemplateRef } from '@angular/core';
-import { SearchComponentComponent } from './search-component/search-component.component';
+import { Component } from '@angular/core';
+import { CustomSearchComponent } from './custom-search/custom-search.component';
 import { MatTableColumns } from './utility/custom-table/custom-table.component';
 
 export interface PeriodicElement {
@@ -23,11 +23,11 @@ const ELEMENT_DATA: PeriodicElement[] = [
   { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
 ];
 
-const ELEMENT_METADATA: MatTableColumns[] = [
-  { name: 'position', label: '#' },
-  { name: 'name', label: 'Name' },
-  { name: 'weight', label: 'Atomic Weight' },
-  { name: 'symbol', label: 'Symbol' }
+const ELEMENT_METADATA: MatTableColumns<PeriodicElement>[] = [
+  { name: 'position', label: '#', display: (element: PeriodicElement) => `${element.position}` },
+  { name: 'name', label: 'Name', display: (element: PeriodicElement) => `<b>${element.name}</b>` },
+  { name: 'weight', label: 'Atomic Weight', display: (element: PeriodicElement) => `${element.weight}` },
+  { name: 'symbol', label: 'Symbol', display: (element: PeriodicElement) => `${element.symbol}` }
 ];
 
 @Component({
@@ -36,8 +36,9 @@ const ELEMENT_METADATA: MatTableColumns[] = [
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  columns: MatTableColumns[] = ELEMENT_METADATA;
+  columns: MatTableColumns<PeriodicElement>[] = ELEMENT_METADATA;
   data: PeriodicElement[] = ELEMENT_DATA;
+  searchComponent: ComponentType<CustomSearchComponent> = CustomSearchComponent;
 
   showAll() {
     this.data = ELEMENT_DATA;

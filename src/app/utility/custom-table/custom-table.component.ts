@@ -1,14 +1,18 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, ContentChild, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { ComponentType } from '@angular/cdk/portal';
+import { Component, ContentChild, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatTableDataSource } from '@angular/material/table';
+import { RowActionDirective } from './row-action.directive';
+import { SelectedActionDirective } from './selected-action.directive';
+import { TableFilterDirective } from './table-filter.directive';
 
 
-export interface MatTableColumns {
+export interface MatTableColumns<T> {
   name: string;
   label: string;
+  display: (element: T) => string;
 }
 
 @Component({
@@ -19,7 +23,7 @@ export interface MatTableColumns {
 export class CustomTableComponent<T> implements OnInit {
 
   private _data: T[] = [];
-  @Input("data") set data(d: T[]) {
+  @Input() set data(d: T[]) {
     this._data = d;
     if (this._data) {
       this.dataSource = new MatTableDataSource<T>(this._data);
@@ -27,17 +31,18 @@ export class CustomTableComponent<T> implements OnInit {
     }
   }
 
-
-  @Input("columns") columns: MatTableColumns[] = [];
-  @Input("selectable") selectable: boolean = false;
+  @Input() tableHeaderText: string = '';
+  @Input() columns: MatTableColumns<T>[] = [];
+  @Input() selectable: boolean = false;
+  @Input() customSearchComponent!: ComponentType<unknown>;
 
   @ViewChild('drawer') public drawer!: MatDrawer;
-  @ViewChild('drawer', { read: ViewContainerRef, static: true }) drawerRef!: ViewContainerRef;
 
-  @ContentChild("searchComponentTemplate") searchComponentTemplate!: TemplateRef<unknown>;
-  @ContentChild("selectedActionTemplate", { static: false }) selectedActionTemplate!: TemplateRef<any>;
-  @ContentChild("rowActionTemplate", { static: false }) rowActionTemplate!: TemplateRef<any>;
-  @ContentChild("filterActionTemplate", { static: false }) filterActionTemplate!: TemplateRef<any>;
+  @ContentChild(SelectedActionDirective) selectedAction!: SelectedActionDirective;
+  @ContentChild(RowActionDirective) rowAction!: RowActionDirective;
+  @ContentChild(TableFilterDirective) tableFilter!: TableFilterDirective;
+
+  @ViewChild('customSearchPlaceholder', { read: ViewContainerRef, static: true }) customSearchPlaceholderRef!: ViewContainerRef;
 
   selectColumnName: string = '__select';
   rowActionColumn: string = '__actions';
@@ -47,7 +52,7 @@ export class CustomTableComponent<T> implements OnInit {
   selection = new SelectionModel<T>(true, []);
   selectionMode: FormControl = new FormControl(false);
 
-  constructor(public dialog: MatDialog) { }
+  constructor() { }
 
   ngOnInit(): void {
 
@@ -66,13 +71,20 @@ export class CustomTableComponent<T> implements OnInit {
         this.selectionMode.setValue(false);
       }
     });
+
+    this.setupCustomSearchPlaceholder();
+  }
+
+  private setupCustomSearchPlaceholder() {
+    this.customSearchPlaceholderRef.clear();
+    this.customSearchPlaceholderRef.createComponent(this.customSearchComponent);
   }
 
   get displayedColumns(): string[] {
-    return [...this.selectable ? [this.selectColumnName] : [], ...this.iterateColumns, ...this.rowActionTemplate ? [this.rowActionColumn] : []];
+    return [...this.selectable ? [this.selectColumnName] : [], ...this.iterateColumns, ...this.rowAction ? [this.rowActionColumn] : []];
   }
 
-  get iterateColumns(): string[] {
+  private get iterateColumns(): string[] {
     return [...this.columns.map(x => x.name)];
   }
 
