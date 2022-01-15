@@ -35,7 +35,7 @@
                     </td>
                 </ng-container>
 
-                <ng-container *ngFor="let column of columns" [matColumnDef]="column.name">
+                <ng-container *ngFor="let column of columns" [matColumnDef]="column.property">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{column.label}} </th>
                     <td mat-cell *matCellDef="let element">
                         <span [innerHTML]="column.display(element)"></span>

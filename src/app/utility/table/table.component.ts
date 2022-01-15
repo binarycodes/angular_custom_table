@@ -6,26 +6,22 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ColumnProperty } from './column-property.interface';
 import { RowActionDirective } from './row-action.directive';
 import { SelectedActionDirective } from './selected-action.directive';
 import { TableFilterDirective } from './table-filter.directive';
 
 
-export interface MatTableColumns<T> {
-  name: string;
-  label: string;
-  display: (element: T) => string;
-}
 
 @Component({
-  selector: 'app-custom-table',
-  templateUrl: './custom-table.component.html',
-  styleUrls: ['./custom-table.component.scss']
+  selector: 'bn-table',
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.scss']
 })
-export class CustomTableComponent<T> implements OnInit {
+export class TableComponent<T> implements OnInit {
 
   @Input() tableHeader: string = '';
-  @Input() columns: MatTableColumns<T>[] = [];
+  @Input() columns: ColumnProperty<T>[] = [];
   @Input() selectable: boolean = false;
   @Input() paginate: boolean = true;
   @Input() recordsPerPage: number = 10;
@@ -56,7 +52,6 @@ export class CustomTableComponent<T> implements OnInit {
   rowActionColumn: string = '__actions';
 
   dataSource: MatTableDataSource<T> = new MatTableDataSource();
-  labelMap: Map<string, string> = new Map();
   selection = new SelectionModel<T>(true, []);
   selectionMode: FormControl = new FormControl(false);
 
@@ -65,12 +60,6 @@ export class CustomTableComponent<T> implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
-    if (this.columns) {
-      Object.entries(this.columns).forEach(([, v]) => {
-        this.labelMap.set(v.name, v.label);
-      });
-    }
 
     this.selectionMode.valueChanges.subscribe((val: boolean) => {
       this.dataSource.data = val ? this.selectedItems : this._data;
@@ -103,12 +92,12 @@ export class CustomTableComponent<T> implements OnInit {
   }
 
   get pageSizeOptions(): number[] {
-    const lastOptionRequired: number = this._data.length + (this.recordsPerPage-1);
+    const lastOptionRequired: number = this._data.length + (this.recordsPerPage - 1);
     return [1, 2, 3, 4, 5].map(num => num * this.recordsPerPage).filter(num => num <= lastOptionRequired);
   }
 
   private get iterateColumns(): string[] {
-    return [...this.columns.map(x => x.name)];
+    return [...this.columns.map(x => x.property)];
   }
 
   isAllSelected(): boolean {
