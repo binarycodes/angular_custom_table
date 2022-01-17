@@ -97,7 +97,7 @@ export class TableComponent<T> implements OnInit {
   }
 
   private get iterateColumns(): string[] {
-    return [...this.columns.map(x => x.property)];
+    return [...this.columns.map(x => x.column)];
   }
 
   isAllSelected(): boolean {

@@ -26,10 +26,10 @@ const ELEMENT_DATA: PeriodicElement[] = [
 ];
 
 const ELEMENT_METADATA: ColumnProperty<PeriodicElement>[] = [
-  { property: 'position', label: '#', display: (element: PeriodicElement) => `${element.position}` },
-  { property: 'name', label: 'Name', display: (element: PeriodicElement) => `<b>${element.name}</b>` },
-  { property: 'weight', label: 'Atomic Weight', display: (element: PeriodicElement) => `${element.weight}` },
-  { property: 'symbol', label: 'Symbol', display: (element: PeriodicElement) => `${element.symbol}` }
+  { column: 'position', label: '#', display: (element: PeriodicElement) => `${element.position}` },
+  { column: 'name', label: 'Name', display: (element: PeriodicElement) => `<strong>${element.name}</strong>` },
+  { column: 'weight', label: 'Atomic Weight', display: (element: PeriodicElement) => `<em>${element.weight}</em>` },
+  { column: 'symbol', label: 'Symbol', display: (element: PeriodicElement) => `${element.symbol}` }
 ];
 
 @Component({
