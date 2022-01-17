@@ -2,6 +2,7 @@ import { ComponentType } from '@angular/cdk/portal';
 import { Component } from '@angular/core';
 import { CustomSearchComponent } from './custom-search/custom-search.component';
 import { ColumnProperty } from './utility/table/column-property.interface';
+import { FilterDefinition } from './utility/table/filter-definition.interface';
 
 
 export interface PeriodicElement {
@@ -42,6 +43,10 @@ export class AppComponent {
   data: PeriodicElement[] = ELEMENT_DATA;
   searchComponent: ComponentType<CustomSearchComponent> = CustomSearchComponent;
 
+  constructor() {
+    this.check();
+  }
+
   showAll() {
     this.data = ELEMENT_DATA;
   }
@@ -62,5 +67,58 @@ export class AppComponent {
   delete(data: PeriodicElement[]) {
     console.log("delete....");
     console.log(data);
+  }
+
+
+  private check() {
+    const filterDef1: FilterDefinition = {
+      type: ['eq', 'greaterEqual', 'lessEqual']
+    };
+
+    const filterDef2: FilterDefinition = {
+      type: 'dropdown',
+      parameters: {
+        multiple: true
+      }
+    };
+
+    const filterDef3: FilterDefinition = {
+      type: 'auto_complete',
+      parameters: {
+        multiple: false,
+        partial: true
+      }
+    };
+
+    const filterDef4: FilterDefinition = {
+      type: 'plain_text',
+      parameters: {
+        partial: true,
+        delimeter: null
+      }
+    };
+
+    const filterDef5: FilterDefinition = {
+      type: 'plain_text',
+      parameters: {
+        partial: true,
+        delimeter: ','
+      }
+    };
+
+    const filterDef6: FilterDefinition = {
+      type: ['date']
+    };
+
+    [filterDef1, filterDef2, filterDef3, filterDef4, filterDef5, filterDef6]
+      .map(filter => this.checkFunction(filter));
+  }
+
+  private checkFunction(filter: FilterDefinition) {
+    console.log('-'.repeat(50));
+    console.log(filter.type);
+    if ('parameters' in filter) {
+      console.log(filter.parameters);
+    }
   }
 }
